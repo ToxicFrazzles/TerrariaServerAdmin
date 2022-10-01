@@ -26,7 +26,10 @@ async def main():
 
     selected_server: TerrariaServer = None
     while True:
-        command, *args = (await ainput()).strip().split()
+        args = (await ainput()).strip().split()
+        if not args:
+            continue
+        command = args.pop(0)
         if command == "exit_all":
             for _, server in servers.items():
                 await server.stop()
