@@ -7,8 +7,8 @@ from cron_converter import Cron
 
 
 class TerrariaServer:
-    task: asyncio.Task
-    p: asyncio.subprocess.Process
+    task: asyncio.Task = None
+    p: asyncio.subprocess.Process = None
 
     def __init__(self, server_path: Path, config: ServerConfig):
         self.config = config
