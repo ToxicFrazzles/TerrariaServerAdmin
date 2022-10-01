@@ -4,7 +4,8 @@
   "servers": {
     "server1": {
       "maxplayers": 5,
-      "port": 7778
+      "port": 7778,
+      "regenerate_schedule": "0 5 * * *"
     },
     "server2": {
       "port":7779

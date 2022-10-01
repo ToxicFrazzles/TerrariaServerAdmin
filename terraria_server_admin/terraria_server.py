@@ -1,7 +1,9 @@
 import asyncio
+from datetime import datetime
 from .config import ServerConfig
 from pathlib import Path
 from asyncio import sleep
+from cron_converter import Cron
 
 
 class TerrariaServer:
@@ -24,6 +26,18 @@ class TerrariaServer:
             stderr=asyncio.subprocess.DEVNULL
         )
 
+        async def regenerator():
+            cron = Cron(self.config.regenerate_schedule)
+            ref = datetime.now()
+            schedule = cron.schedule(ref)
+            sleep_for = schedule.next() - ref
+            await asyncio.sleep(sleep_for.seconds)
+            await self.stop()
+            await self.delete_world()
+            self.run()
+
+        if self.config.regenerate_schedule is not None:
+            asyncio.create_task(regenerator())
         while self.p.returncode is None:
             if self.p.stdout.at_eof():
                 break
@@ -32,6 +46,8 @@ class TerrariaServer:
                 print(f"[{self.config.name}]:", data.decode('utf-8').rstrip())
 
     def run(self):
+        if self.task:
+            return
         self.task = asyncio.create_task(self._worker())
 
     async def stop(self):

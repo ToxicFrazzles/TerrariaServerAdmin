@@ -25,7 +25,7 @@ class Config:
 
 
 class ServerConfig:
-    def __init__(self, *, maxplayers=8, worldpath=None, name, seed=None, difficulty=0, autocreate=3, port, password=None):
+    def __init__(self, *, maxplayers=8, worldpath=None, name, seed=None, difficulty=0, autocreate=3, port, password=None, regenerate_schedule=None):
         self.maxplayers = maxplayers
         self.worldpath = Path(worldpath or "~/.local/share/Terraria/Worlds")
         self.world = self.worldpath / f"name.replace(' ', '_').wld"
@@ -36,6 +36,8 @@ class ServerConfig:
         self.autocreate = autocreate
         self.port = port
         self.password = password
+
+        self.regenerate_schedule = regenerate_schedule
 
     @property
     def command_arguments(self):
