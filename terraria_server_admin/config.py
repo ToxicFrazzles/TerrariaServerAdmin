@@ -41,20 +41,20 @@ class ServerConfig:
         self.regenerate_schedule = regenerate_schedule
 
     @property
-    def command_arguments(self):
-        args = [
-            f"-maxplayers {self.maxplayers}",
-            f"-worldpath {self.worldpath}",
-            f"-world {self.world}",
-            f"-worldname {self.name.replace(' ', '_')}",
-            f"-port {self.port}",
-            f"-difficulty {self.difficulty}",
-            f"-autocreate {self.autocreate}"
+    def config_file_contents(self):
+        options = [
+            f"world={self.world.resolve()}",
+            f"autocreate={self.autocreate}",
+            f"worldname={self.name}",
+            f"difficulty={self.difficulty}",
+            f"maxplayers={self.maxplayers}",
+            f"port={self.port}",
+            f"worldpath={self.worldpath.resolve()}"
         ]
-        if self.password:
-            args.append(f"-pass {self.password}")
         if self.seed:
-            args.append(f"-seed {self.seed}")
+            options.append(f"seed={self.seed}")
+        if self.password:
+            options.append(f"password={self.password}")
         if self.motd:
-            args.append(f"-motd '{self.motd}'")
-        return args
+            options.append(f"motd={self.motd}")
+        return "\r\n".join(options)

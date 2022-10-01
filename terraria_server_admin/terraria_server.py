@@ -16,9 +16,12 @@ class TerrariaServer:
         self.server_path = server_path
 
     async def _worker(self):
+        config_file_path = self.server_path / f"{self.config.name}.txt"
+        with config_file_path.open("w") as f:
+            f.write(self.config.config_file_contents)
         command = " ".join([
             f'{self.server_path / "TerrariaServer.bin.x86_64"}',
-            *self.config.command_arguments])
+            f"-config {config_file_path.resolve()}"])
         self.p = await asyncio.create_subprocess_shell(
             command,
             stdin=asyncio.subprocess.PIPE,
