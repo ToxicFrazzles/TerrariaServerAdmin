@@ -46,7 +46,7 @@ async def main():
                 print(f"Unknown server: {args[0]}")
         elif command == "list_servers":
             for server_name in servers:
-                print(server_name)
+                print("\t" + server_name)
         elif command == "regenerate" and selected_server:
             await selected_server.stop()
             await selected_server.delete_world()
