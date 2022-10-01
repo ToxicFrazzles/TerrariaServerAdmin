@@ -28,7 +28,7 @@ class ServerConfig:
     def __init__(self, *, maxplayers=8, worldpath=None, name, seed=None, difficulty=0, autocreate=3, port, password=None, regenerate_schedule=None, motd=None):
         self.maxplayers = maxplayers
         self.worldpath = Path(worldpath or "~/.local/share/Terraria/Worlds")
-        self.world = self.worldpath / f"name.replace(' ', '_').wld"
+        self.world = self.worldpath / f"{name.replace(' ', '_')}.wld"
         self.worldpath.mkdir(exist_ok=True, parents=True)
         self.name = name
         self.seed = seed
