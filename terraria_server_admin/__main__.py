@@ -21,10 +21,11 @@ async def main():
     servers: Dict[str, TerrariaServer] = {name: TerrariaServer(latest_server, c) for name, c in conf.servers.items()}
     for name, server in servers.items():
         print("starting server:", name)
-        server.print_output = True
+        # server.print_output = True
         server.run()
 
-    selected_server: TerrariaServer = None
+    selected_server: TerrariaServer = next(iter(servers.items()))[1]
+    selected_server.print_output = True
     while True:
         args = (await ainput()).strip().split()
         if not args:
@@ -43,6 +44,9 @@ async def main():
                 print(f"Selected server: {args[0]}")
             else:
                 print(f"Unknown server: {args[0]}")
+        elif command == "list_servers":
+            for server_name in servers:
+                print(server_name)
         elif command == "regenerate" and selected_server:
             await selected_server.stop()
             await selected_server.delete_world()
