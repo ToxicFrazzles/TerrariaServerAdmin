@@ -48,6 +48,10 @@ async def main():
             for server_name in servers:
                 print("\t" + server_name)
         elif command == "regenerate" and selected_server:
+            print(f"Are you sure you want to regenerate {selected_server.config.name}?")
+            confirmation = (await ainput()).strip().lower()
+            if confirmation not in ["yes", "y", "affirmative"]:
+                continue
             await selected_server.stop()
             await selected_server.delete_world()
             selected_server.run()
