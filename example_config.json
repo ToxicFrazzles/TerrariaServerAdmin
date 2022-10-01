@@ -1,0 +1,13 @@
+{
+  "maxplayers": 16,
+  "worldpath": "~/.local/share/Terraria/Worlds",
+  "servers": {
+    "server1": {
+      "maxplayers": 5,
+      "port": 7778
+    },
+    "server2": {
+      "port":7779
+    }
+  }
+}

@@ -127,3 +127,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+
+# JetBrains IDE files
+.idea/
+
+
+
+# Terraria Server files
+server.zip
+server/
