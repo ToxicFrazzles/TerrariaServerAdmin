@@ -10,7 +10,6 @@ class TerrariaServer:
 
     def __init__(self, server_path: Path, config: ServerConfig):
         self.config = config
-        self.stdin = asyncio.Queue()
         self.print_output = False
         self.server_path = server_path
 
@@ -25,20 +24,6 @@ class TerrariaServer:
             stderr=asyncio.subprocess.DEVNULL
         )
 
-        # async def reader():
-        #     while self.p.returncode is None:
-        #         if self.p.stdout.at_eof():
-        #             break
-        #         data = await self.p.stdout.readline()
-        #         if self.print_output:
-        #             print(f"[{self.config.name}]:", data.decode('utf-8').rstrip())
-        #
-        # r = asyncio.create_task(reader())
-        # while self.p.returncode is None:
-        #     cmd: str = await self.stdin.get()
-        #     self.p.stdin.write(cmd.encode('utf-8'))
-        #     await self.p.stdin.drain()
-        # r.cancel()
         while self.p.returncode is None:
             if self.p.stdout.at_eof():
                 break
@@ -55,6 +40,7 @@ class TerrariaServer:
             await asyncio.wait_for(self.task, 120)
         except asyncio.TimeoutError:
             self.p.kill()
+            self.task.cancel()
         self.p = None
         self.task = None
 
@@ -64,3 +50,7 @@ class TerrariaServer:
         full_command = " ".join([command, *args]) + "\r\n"
         self.p.stdin.write(full_command.encode('utf-8'))
         await self.p.stdin.drain()
+
+    async def delete_world(self):
+        file_path = self.config.world
+        file_path.unlink()

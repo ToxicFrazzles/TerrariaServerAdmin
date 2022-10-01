@@ -40,8 +40,10 @@ async def main():
                 print(f"Selected server: {args[0]}")
             else:
                 print(f"Unknown server: {args[0]}")
-        elif command == "exit" and selected_server:
+        elif command == "regenerate" and selected_server:
             await selected_server.stop()
+            await selected_server.delete_world()
+            selected_server.run()
         elif selected_server:
             await selected_server.send_command(command, *args)
 
