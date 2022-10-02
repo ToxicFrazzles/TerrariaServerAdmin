@@ -58,6 +58,10 @@ async def main():
         elif command == "restart" and selected_server:
             await selected_server.stop()
             await selected_server.run()
+        elif command == "broadcast":
+            if len(args) > 0:
+                for name, server in servers.items():
+                    await server.send_command("say", *args)
         elif selected_server:
             await selected_server.send_command(command, *args)
 

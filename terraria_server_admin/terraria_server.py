@@ -49,9 +49,10 @@ class TerrariaServer:
             if self.p.stdout.at_eof():
                 break
             data = (await self.p.stdout.readline()).decode('utf-8').rstrip()
+            chat_match = chat_regex.match(data)
             if self.print_output:
                 print(f"[{self.config.name}]:", data)
-            elif chat_regex.match(data):
+            elif chat_match and chat_match[0] != "Server":
                 print(f"[{self.config.name}]:", data)
 
     def run(self):
