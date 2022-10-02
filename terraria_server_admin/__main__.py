@@ -14,9 +14,10 @@ async def ainput(*args):
 
 async def main():
     if len(sys.argv) > 1:
-        conf = Config.from_json(Path(sys.argv[1]))
+        config_path = Path(sys.argv[1])
     else:
-        conf = Config.from_json(Path('config.json'))
+        config_path = Path('config.json')
+    conf = Config.from_json(config_path)
     latest_server = get_latest_server() / "Linux"
     servers: Dict[str, TerrariaServer] = {name: TerrariaServer(latest_server, c) for name, c in conf.servers.items()}
     for name, server in servers.items():
@@ -62,6 +63,30 @@ async def main():
             if len(args) > 0:
                 for name, server in servers.items():
                     await server.send_command("say", *args)
+        elif command == "reload_config":
+            new_config = Config.from_json(config_path)
+            updated_servers = conf.changed_servers(new_config)
+            if not updated_servers:
+                print("No config changes detected...")
+                continue
+            for name in updated_servers:
+                if name not in new_config.servers:
+                    # New config doesn't have a previously existing server. Time to stop it and remove
+                    server = servers.pop(name)
+                    if server == selected_server:
+                        selected_server = None
+                    await server.stop()
+                elif name not in servers:
+                    # New config has a new server. Time to create it.
+                    servers[name] = TerrariaServer(latest_server, new_config.servers[name])
+                    servers[name].run()
+                else:
+                    # Existing server has been updated. Shut it down, swap the config and restart it.
+                    servers[name].config = new_config.servers[name]
+                    await servers[name].stop()
+                    servers[name].run()
+            conf = new_config
+            print("Configs updated")
         elif selected_server:
             await selected_server.send_command(command, *args)
 
