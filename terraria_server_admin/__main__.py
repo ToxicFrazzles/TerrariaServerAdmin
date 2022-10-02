@@ -55,6 +55,9 @@ async def main():
             await selected_server.stop()
             await selected_server.delete_world()
             selected_server.run()
+        elif command == "restart" and selected_server:
+            await selected_server.stop()
+            await selected_server.run()
         elif selected_server:
             await selected_server.send_command(command, *args)
 
