@@ -4,6 +4,10 @@ from .config import ServerConfig
 from pathlib import Path
 from asyncio import sleep
 from cron_converter import Cron
+import re
+
+
+chat_regex = re.compile(r"<([^>]+)>\s*(.+)")
 
 
 class TerrariaServer:
@@ -44,9 +48,11 @@ class TerrariaServer:
         while self.p.returncode is None:
             if self.p.stdout.at_eof():
                 break
-            data = await self.p.stdout.readline()
+            data = (await self.p.stdout.readline()).decode('utf-8').rstrip()
             if self.print_output:
-                print(f"[{self.config.name}]:", data.decode('utf-8').rstrip())
+                print(f"[{self.config.name}]:", data)
+            elif chat_regex.match(data):
+                print(f"[{self.config.name}]:", data)
 
     def run(self):
         if self.task:
