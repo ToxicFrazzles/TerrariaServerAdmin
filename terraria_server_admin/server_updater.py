@@ -20,10 +20,11 @@ async def get_latest_version_url():
 
 async def _download_file(url, dest: Path):
     async with aiohttp.ClientSession() as sesh:
-        async with dest.open("wb") as f, sesh.get(url) as r:
+        async with sesh.get(url) as r:
             r.raise_for_status()
-            async for data in r.content.iter_chunked(2**13):
-                f.write(data)
+            with dest.open("wb") as f:
+                async for data in r.content.iter_chunked(2**13):
+                    f.write(data)
 
 
 async def get_latest_server():
