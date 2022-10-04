@@ -1,12 +1,14 @@
 import json
 from typing import Optional, Dict
 from pathlib import Path
+from cron_converter import Cron
 
 
 class Config:
-    def __init__(self, *, servers, worldpath=None, **kwargs):
+    def __init__(self, *, version_check_frequency=None, servers, worldpath=None, **kwargs):
         self.worldpath = Path(worldpath or "~/.local/share/Terraria/Worlds")
         self.servers = {}
+        self.version_check_frequency = Cron(version_check_frequency) if version_check_frequency else None
         for name, c in servers.items():
             for k, v in kwargs.items():
                 c[k] = c.get(k, v)

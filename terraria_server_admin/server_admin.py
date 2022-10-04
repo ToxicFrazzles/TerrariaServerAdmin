@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict
 from .config import Config
@@ -31,6 +32,20 @@ class ServerAdmin:
             return wrapper
         return decorator
 
+    async def _version_checker(self):
+        while self._running:
+            now = datetime.now()
+            schedule = self.config.version_check_frequency.schedule(now)
+            delay = (schedule.next() - now).seconds
+            if delay > 0:
+                await asyncio.sleep(delay)
+            latest = await get_latest_server()
+            if latest != self.latest_server:
+                self.latest_server = latest
+                for name, server in self.servers.items():
+                    await server.stop()
+                    server.run()
+
     async def _command_event(self, command, *args):
         if command in self._command_handlers:
             await self._command_handlers[command](*args)
@@ -40,6 +55,8 @@ class ServerAdmin:
     async def _run(self):
         print("Checking for updates...")
         await self.update()
+        if self.config.version_check_frequency:
+            asyncio.create_task(self._version_checker())
         print("Latest version of the Terraria server is installed")
         for name, config in self.config.servers.items():
             print("Starting server:", name)
