@@ -21,14 +21,14 @@ class ServerAdmin:
         self._command_handlers = {}
         self._running = False
 
-    def command(self, cmd):
+    def command(self, cmd=None):
         def decorator(func):
             async def wrapper(*args):
                 try:
                     await func(*args, server=self.selected_server)
                 except Exception as e:
                     print(e)
-            self._command_handlers[cmd] = wrapper
+            self._command_handlers[cmd or func.__name__] = wrapper
             return wrapper
         return decorator
 
