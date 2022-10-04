@@ -8,7 +8,7 @@ class Config:
     def __init__(self, *, version_check_frequency=None, servers, worldpath=None, **kwargs):
         self.worldpath = Path(worldpath or "~/.local/share/Terraria/Worlds")
         self.servers = {}
-        self.version_check_frequency = Cron(version_check_frequency) if version_check_frequency else None
+        self.version_check_frequency = Cron(version_check_frequency) if version_check_frequency else Cron("*/30 * * * *")
         for name, c in servers.items():
             for k, v in kwargs.items():
                 c[k] = c.get(k, v)
