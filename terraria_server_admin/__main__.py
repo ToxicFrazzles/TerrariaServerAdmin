@@ -20,7 +20,8 @@ async def exit_all(*args, server):
 
 
 @admin.command("select")
-async def select(server_name, *, server):
+async def select(*server_name, server):
+    server_name = " ".join(server_name)
     if server_name in admin.servers:
         if admin.selected_server:
             admin.selected_server.print_output = False
