@@ -14,7 +14,7 @@ async def _get_json(url: str):
 
 async def get_latest_version_url():
     url = "https://terraria.org/api/get/dedicated-servers-names"
-    name = await _get_json(url)
+    name = (await _get_json(url))[0]
     return f"https://terraria.org/api/download/pc-dedicated-server/{name}"
 
 
