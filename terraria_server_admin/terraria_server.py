@@ -71,12 +71,16 @@ class TerrariaServer:
         self.task = None
 
     async def send_command(self, command, *args):
-        if self.p is None:
+        if self.p is None or self.p.returncode is not None:
             return
-        full_command = " ".join([command, *args]) + "\r\n"
-        self.p.stdin.write(full_command.encode('utf-8'))
-        await self.p.stdin.drain()
+        try:
+            full_command = " ".join([command, *args]) + "\r\n"
+            self.p.stdin.write(full_command.encode('utf-8'))
+            await self.p.stdin.drain()
+        except ConnectionResetError:
+            pass
 
     async def delete_world(self):
         file_path = self.config.world
-        file_path.unlink()
+        if file_path.is_file():
+            file_path.unlink()
