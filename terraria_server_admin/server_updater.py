@@ -1,31 +1,38 @@
 import re
-import requests
+import aiohttp
 from pathlib import Path
 from zipfile import ZipFile
 from time import sleep
 
 
-def get_latest_version_url():
-    r = requests.get("https://terraria.org/api/get/dedicated-servers-names")
-    r.raise_for_status()
-    name = r.json()[0]
+async def _get_json(url: str):
+    async with aiohttp.ClientSession() as sesh:
+        async with sesh.get(url) as r:
+            r.raise_for_status()
+            return await r.json()
+
+
+async def get_latest_version_url():
+    url = "https://terraria.org/api/get/dedicated-servers-names"
+    name = await _get_json(url)
     return f"https://terraria.org/api/download/pc-dedicated-server/{name}"
 
 
-def download_file(url, dest: Path):
-    with dest.open("wb") as f, requests.get(url, stream=True) as r:
-        r.raise_for_status()
-        for chunk in r.iter_content(chunk_size=2**13):
-            f.write(chunk)
+async def _download_file(url, dest: Path):
+    async with aiohttp.ClientSession() as sesh:
+        async with dest.open("wb") as f, sesh.get(url) as r:
+            r.raise_for_status()
+            async for data in r.content.iter_chunked(2**13):
+                f.write(data)
 
 
-def get_latest_server():
-    url = get_latest_version_url()
+async def get_latest_server():
+    url = await get_latest_version_url()
     version = re.findall(r'terraria-server-(\d+)\.zip', url)[0]
     server = Path('server')
     if (server / version).is_dir():
         return server / version
-    download_file(url, Path('server.zip'))
+    await _download_file(url, Path('server.zip'))
     with ZipFile(Path('server.zip'), 'r') as zip_ref:
         zip_ref.extractall(server)
     (server / version / "Linux" / "TerrariaServer.bin.x86_64").chmod(0o775)

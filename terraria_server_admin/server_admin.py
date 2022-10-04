@@ -77,7 +77,7 @@ class ServerAdmin:
         asyncio.run(self._run())
 
     async def update(self):
-        self.latest_server = get_latest_server() / "Linux"
+        self.latest_server = (await get_latest_server()) / "Linux"
 
     async def stop(self):
         self._running = False
