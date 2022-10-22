@@ -29,7 +29,7 @@ async def _download_file(url, dest: Path):
 
 async def get_latest_server():
     url = await get_latest_version_url()
-    version = re.findall(r'terraria-server-(\d+)\.zip', url)[0]
+    version = re.findall(r'terraria-server-(\d+).*\.zip', url)[0]
     server = Path('server')
     if (server / version).is_dir():
         return server / version
